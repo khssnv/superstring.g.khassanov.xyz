@@ -1,0 +1,7 @@
+*.bak
+.git
+debug/
+target/
+Cargo.lock
+**/*.rs.bk
+*.pdb
