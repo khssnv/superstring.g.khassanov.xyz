@@ -9,6 +9,7 @@ services:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
       - letsencrypt:/letsencrypt
     command:
+      - "--accesslog=true"
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
       - "--entrypoints.web.address=:80"
@@ -17,6 +18,7 @@ services:
       - "--entrypoints.websecure.address=:443"
       - "--certificatesresolvers.letsencrypt.acme.tlschallenge=true"
       - "--certificatesresolvers.letsencrypt.acme.caserver=https://acme-v02.api.letsencrypt.org/directory"
+      # - "--certificatesresolvers.letsencrypt.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory"
       - "--certificatesresolvers.letsencrypt.acme.email=a.khssnv@gmail.com"
       - "--certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json"
   
@@ -27,10 +29,10 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.services.supersting.loadbalancer.server.port=4000"
-      - "traefik.http.routers.whoami.entrypoints=websecure"
-      - "traefik.http.routers.whoami.rule=Host(`superstring.g.khassanov.xyz`)"
-      - "traefik.http.routers.whoami.tls=true"
-      - "traefik.http.routers.whoami.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.supersting.entrypoints=websecure"
+      - "traefik.http.routers.supersting.rule=Host(`superstring.g.khassanov.xyz`)"
+      - "traefik.http.routers.supersting.tls=true"
+      - "traefik.http.routers.supersting.tls.certresolver=letsencrypt"
 
 volumes:
   letsencrypt: {}
