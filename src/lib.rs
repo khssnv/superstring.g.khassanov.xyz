@@ -1,3 +1,22 @@
+pub fn unique_by_substrings(strings: Vec<String>) -> Vec<String> {
+    let mut output = strings.clone();
+    output.sort_unstable();
+    output.dedup();
+    output.retain(|candidate| {
+        let mut occurances = 0;
+        for s in &strings {
+            if s.contains(candidate) {
+                occurances += 1;
+            }
+        }
+        if occurances - 1 > 0 {
+            return false
+        }
+        true
+    });
+    output
+}
+
 pub mod naive {
     use itertools::Itertools;
 

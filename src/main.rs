@@ -15,7 +15,7 @@ use tower_http::cors::CorsLayer;
 use utoipa::{Component, OpenApi};
 use utoipa_swagger_ui::Config;
 
-use superstring::{naive, tsp};
+use superstring::{naive, tsp, unique_by_substrings};
 
 #[tokio::main]
 async fn main() {
@@ -51,8 +51,16 @@ async fn main() {
                 CorsLayer::new()
                     .allow_origin("http://localhost:4000".parse::<HeaderValue>().unwrap())
                     .allow_origin("http://127.0.0.1:4000".parse::<HeaderValue>().unwrap())
-                    .allow_origin("http://superstring.g.khassanov.xyz".parse::<HeaderValue>().unwrap())
-                    .allow_origin("http://superstring.garage.khassanov.xyz".parse::<HeaderValue>().unwrap())
+                    .allow_origin(
+                        "http://superstring.g.khassanov.xyz"
+                            .parse::<HeaderValue>()
+                            .unwrap(),
+                    )
+                    .allow_origin(
+                        "http://superstring.garage.khassanov.xyz"
+                            .parse::<HeaderValue>()
+                            .unwrap(),
+                    )
                     .allow_methods([Method::POST]),
             );
         serve(app, 4000).await;
@@ -98,32 +106,40 @@ async fn serve_swagger_ui(
     )
 )]
 async fn handler(Json(payload): Json<CreateShortestCommonSuperstring>) -> impl IntoResponse {
+    println!("variant={:?}, arguments={:?}", payload.variant, payload.substrings);
+
+    let input_clean = unique_by_substrings(payload.substrings);
+    let resp;
     match payload.variant.as_str() {
         "naive" => {
-            return (
+            resp = (
                 StatusCode::OK,
                 Json(ShortestCommonSuperstring {
-                    shortest_common_superstring: naive::shortest_superstring(payload.substrings),
+                    shortest_common_superstring: naive::shortest_superstring(input_clean),
                 }),
             );
         }
         "tsp" => {
-            return (
+            resp = (
                 StatusCode::OK,
                 Json(ShortestCommonSuperstring {
-                    shortest_common_superstring: tsp::shortest_superstring(payload.substrings),
+                    shortest_common_superstring: tsp::shortest_superstring(input_clean),
                 }),
             );
         }
         _ => {
-            return (
+            resp = (
                 StatusCode::BAD_REQUEST,
                 Json(ShortestCommonSuperstring {
                     shortest_common_superstring: String::from(""),
                 }),
             );
         }
-    }
+    };
+
+    println!("resp={:?}", resp);
+
+    resp
 }
 
 #[derive(Deserialize, Component)]
@@ -132,7 +148,7 @@ struct CreateShortestCommonSuperstring {
     substrings: Vec<String>,
 }
 
-#[derive(Serialize, Component)]
+#[derive(Serialize, Component, Debug)]
 struct ShortestCommonSuperstring {
     shortest_common_superstring: String,
 }
