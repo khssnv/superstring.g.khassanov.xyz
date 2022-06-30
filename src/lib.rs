@@ -2,9 +2,10 @@ pub fn unique_by_substrings(strings: Vec<String>) -> Vec<String> {
     let mut output = strings.clone();
     output.sort_unstable();
     output.dedup();
+    let uniques = output.clone();
     output.retain(|candidate| {
         let mut occurances = 0;
-        for s in &strings {
+        for s in &uniques {
             if s.contains(candidate) {
                 occurances += 1;
             }
